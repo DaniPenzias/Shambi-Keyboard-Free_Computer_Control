@@ -1,1 +1,37 @@
-<mxfile host="app.diagrams.net" modified="2022-10-02T16:08:34.700Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" version="20.4.0" etag="8NJP1SjScRVTMvPV08N8" type="gitlab"><diagram id="pOlh_Mfq639wN6aMagxn">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-10-02T16:12:02.818Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" etag="BNwNjde1ON2Q2XEm65cO" version="20.4.0" type="gitlab">
+  <diagram id="pOlh_Mfq639wN6aMagxn" name="‫עמוד-1‬">
+    <mxGraphModel dx="1038" dy="579" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kE4YGvBAA7jGvdgJ1ddI-1" target="kE4YGvBAA7jGvdgJ1ddI-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kE4YGvBAA7jGvdgJ1ddI-1" target="kE4YGvBAA7jGvdgJ1ddI-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kE4YGvBAA7jGvdgJ1ddI-1" target="kE4YGvBAA7jGvdgJ1ddI-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kE4YGvBAA7jGvdgJ1ddI-1" target="kE4YGvBAA7jGvdgJ1ddI-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-1" value="קלט מהמצלמה" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="348" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-2" value="הזזת אצבע" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="294" y="450" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-4" value="קליק שמאלי" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="174" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-5" value="קליק ימני" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="534" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kE4YGvBAA7jGvdgJ1ddI-6" value="פתיחת/סגירת מקלדת ווירטואלית" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="414" y="450" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
