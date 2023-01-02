@@ -6,6 +6,7 @@
 #include <opencv2/videoio.hpp>
 #include <vector>
 #include "WinApiFunctions.h"
+#include "OpenCVFunctions.h"
 
 #define MOUSE_MOVEMENT 1
 #define LEFT_CLICK 2
@@ -28,7 +29,8 @@ int main()
 
 		//imshow("frame", frame);
 
-		cvtColor(frame, frame, COLOR_BGR2HSV);
+		//cvtColor(frame, frame, COLOR_BGR2HSV);
+		OpenCVFunctions::RGBToHSV(frame);
 
 		//inRange(frame, Scalar(45, 70, 0), Scalar(90, 200, 125), mask); //green
 		//inRange(frame, Scalar(0, 50, 145), Scalar(75, 255, 200), mask); //orange

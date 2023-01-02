@@ -133,10 +133,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="OpenCVFunctions.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="WinApiFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OpenCVFunctions.h" />
     <ClInclude Include="WinApiFunctions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
