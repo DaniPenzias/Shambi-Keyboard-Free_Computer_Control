@@ -189,7 +189,7 @@ void OpenCVFunctions::FindContours(const cv::Mat& frame, std::vector<std::vector
     //        if (visited.at<uchar>(y, x) == 0 && imageCopy.at<uchar>(y, x) != 0)
     //        {
     //            // Initialize the contour and the queue
-    //            std::vector<Point> contour;
+    //            std::vector<cv::Point> contour;
     //            std::queue<Point> queue;
 
     //            // Add the current pixel to the queue and mark it as visited
@@ -222,6 +222,123 @@ void OpenCVFunctions::FindContours(const cv::Mat& frame, std::vector<std::vector
     //        }
     //    }
     //}
+    // Find the external contours of a single-channel 8-bit image using CHAIN_APPROX_SIMPLE
+    // Initialize the output vector
+    contours.clear();
+    
+    // Check if the image is empty
+    if (frame.empty())
+    {
+        return;
+    }
+    
+    // Check if the image is single-channel
+    if (frame.channels() != 1)
+    {
+        throw std::invalid_argument("Image must be single-channel");
+    }
+    
+    // Check if the image is 8-bit
+    if (frame.depth() != CV_8U)
+    {
+        throw std::invalid_argument("Image must be 8-bit");
+    }
+    
+    // Create a visited map to mark which pixels have been visited
+    std::vector<std::vector<bool>> visited(frame.rows, std::vector<bool>(frame.cols, false));
+    
+    // Find the external contours using a depth-first search
+    for (int y = 0; y < frame.rows; y++)
+    {
+        for (int x = 0; x < frame.cols; x++)
+        {
+            // Check if the pixel has not been visited and its value is non-zero
+            if (!visited[y][x] && frame.at<uchar>(y, x) != 0)
+            {
+                // Initialize the contour
+                std::vector<cv::Point> contour;
+                
+                // Perform a depth-first search to find the contour
+                FindContourDFS(frame, visited, x, y, contour);
+                
+                // Approximate the contour using CHAIN_APPROX_SIMPLE
+                std::vector<cv::Point> approx;
+                ApproximateContour(contour, approx);
+                
+                // Add the approximated contour to the output vector
+                contours.push_back(approx);
+            }
+        }
+    }
+}
+
+// Perform a depth-first search to find a contour in a single-channel 8-bit image
+// image: input image (single-channel 8-bit)
+// visited: visited map
+// x: x-coordinate of the current pixel
+// y: y-coordinate of the current pixel
+// contour: output contour (vector of points)
+void OpenCVFunctions::FindContourDFS(const cv::Mat& image, std::vector<std::vector<bool>>& visited, int x, int y, std::vector<cv::Point>& contour)
+{
+    // Add the current pixel to the contour and mark it as visited
+    contour.push_back(cv::Point(x, y));
+    visited[y][x] = true;
+
+    // Check the neighbors of the pixel
+    for (int dy = -1; dy <= 1; dy++)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            // Skip the pixel itself
+            if (dx == 0 && dy == 0)
+            {
+                continue;
+            }
+            // Calculate the neighbor's coordinates
+            int nx = x + dx;
+            int ny = y + dy;
+
+            // Check if the neighbor is inside the image and its value is non-zero
+            if (nx >= 0 && nx < image.cols && ny >= 0 && ny < image.rows && image.at<uchar>(ny, nx) != 0 && !visited[ny][nx])
+            {
+                // Perform a depth-first search on the neighbor
+                FindContourDFS(image, visited, nx, ny, contour);
+            }
+        }
+    }
+}
+
+// Approximate a contour using CHAIN_APPROX_SIMPLE
+// contour: input contour (vector of points)
+// approx: output approximated contour (vector of points)
+void OpenCVFunctions::ApproximateContour(const std::vector<cv::Point>& contour, std::vector<cv::Point>& approx)
+{
+    // Initialize the output vector
+    approx.clear();
+
+    // Check if the contour is empty
+    if (contour.empty())
+    {
+        return;
+    }
+
+    // Iterate through the contour points
+    for (size_t i = 0; i < contour.size(); i++)
+    {
+        // Get the current point and the next point
+        cv::Point p0 = contour[i];
+        cv::Point p1 = contour[(i + 1) % contour.size()];
+
+        // Check if the distance between the current point and the next point is greater than 1
+        if (cv::norm(p1 - p0) > 1)
+        {
+            // Add the current point to the output vector
+            approx.push_back(p0);
+        }
+    }
+
+    // Add the last point to the output vector
+    approx.push_back(contour.back());
 }
 
 void OpenCVFunctions::MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel)

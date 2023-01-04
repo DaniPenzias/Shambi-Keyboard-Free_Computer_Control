@@ -43,7 +43,8 @@ int main()
 		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
 		//bitwise_and(frame, frame, frame, frame);
 
-		findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+		//findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+		OpenCVFunctions::FindContours(frame, contours);
 		std::cout << contours.size() << std::endl;
 		drawContours(frame, contours, -1, (255, 0, 0), 3);
 		//destroyWindow("frame"); //possible to have no window

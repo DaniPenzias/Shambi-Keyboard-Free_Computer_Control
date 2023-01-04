@@ -8,6 +8,9 @@
 
 class OpenCVFunctions
 {
+private:
+	static void FindContourDFS(const cv::Mat& image, std::vector<std::vector<bool>>& visited, int x, int y, std::vector<cv::Point>& contour);
+	static void ApproximateContour(const std::vector<cv::Point>& contour, std::vector<cv::Point>& approx);
 public:
 	static void RGBToHSV(cv::Mat& frame);
 	static void RGBToGray(cv::Mat& frame);
