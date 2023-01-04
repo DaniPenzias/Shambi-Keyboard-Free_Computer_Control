@@ -4,10 +4,8 @@
 #include <queue>
 #include <vector>
 
-// Convert RGB values to HSV values
-// r, g, b: input RGB values (between 0 and 255)
-// h, s, v: output HSV values (h: between 0 and 360, s and v: between 0 and 1)
-void OpenCVFunctions::RGBToHSV(cv::Mat& frame)//int r, int g, int b, float& h, float& s, float& v
+/*function converts RGB values to HSV values on frame*/
+void OpenCVFunctions::RGBToHSV(cv::Mat& frame)
 {
     // Convert the image from RGB to HSV color space
     for (int y = 0; y < frame.rows; y++)
@@ -61,21 +59,82 @@ void OpenCVFunctions::RGBToHSV(cv::Mat& frame)//int r, int g, int b, float& h, f
     }
 }
 
-void OpenCVFunctions::InRange(const cv::Mat& frameIn, const cv::Mat& frameOut, cv::Scalar lower, cv::Scalar upper)
+/*function converts frame with RGB values to GrayScale values*/
+void OpenCVFunctions::RGBToGray(cv::Mat& frame)
 {
-    /*cv::Mat lowerbMat = lower.getMat(), upperbMat = upper.getMat();
-    if (lowerbMat.type() != upperbMat.type())
+    // Check if the input image is empty
+    if (frame.empty())
     {
-        std::cout << "Lower and upper bound arrays must have the same data type" << std::endl;
+        std::cout << "Error: input image is empty!" << std::endl;
+        return;
     }
-    if (lowerbMat.cols != upperbMat.cols || lowerbMat.rows != upperbMat.rows)
+
+    // Check if the input image is a 3-channel BGR image
+    if (frame.type() != CV_8UC3)
     {
-        std::cout << "Lower and upper bound arrays must have the same size" << std::endl;
+        std::cout << "Error: input image is not a 3-channel BGR image!" << std::endl;
+        return;
     }
-    
-    frameIn.getMat().copyTo(frameOut);
-    frameOut.setTo(0, frameIn < lowerbMat);
-    frameOut.setTo(0, frameIn > upperbMat);*/
+
+    // Create an output image with the same size and type as the input image
+    cv::Mat output = cv::Mat::zeros(frame.size(), CV_8UC1);  // <-- changed the type to CV_8UC1
+
+    // Loop through each pixel in the input image
+    for (int y = 0; y < frame.rows; y++)
+    {
+        for (int x = 0; x < frame.cols; x++)
+        {
+            // Get the pixel value at (x, y)
+            cv::Vec3b pixel = frame.at<cv::Vec3b>(y, x);
+
+            // Convert the pixel to grayscale using the luminosity formula:
+            // gray = 0.299*red + 0.587*green + 0.114*blue
+            uint8_t gray = static_cast<uint8_t>(0.299 * pixel[2] + 0.587 * pixel[1] + 0.114 * pixel[0]);
+
+            // Set the output pixel value to the grayscale value
+            uint8_t* output_ptr = output.ptr<uint8_t>(y, x);  // <-- get a pointer to the output pixel
+            *output_ptr = gray;  // <-- dereference the pointer to set the pixel value
+        }
+    }
+
+    // Replace the input image with the output image
+    frame = output;
+}
+
+/*function leaves only the pixels in which the colors values are inside the bordares which we gave*/
+void OpenCVFunctions::InRange(cv::Mat& frame, cv::Scalar lower, cv::Scalar upper)
+{   
+    if (frame.empty())
+    {
+        std::cout << "The input image is empty!" << std::endl;
+    }
+
+    // Filter the frame
+    for (int y = 0; y < frame.rows; y++)
+    {
+        for (int x = 0; x < frame.cols; x++)
+        {
+            // Get the pixel value
+            cv::Vec3b pixel = frame.at<cv::Vec3b>(y, x);
+
+            // Check if the pixel is within the limits
+            if (pixel[0] >= lower[0] && pixel[0] <= upper[0] &&
+                pixel[1] >= lower[1] && pixel[1] <= upper[1] &&
+                pixel[2] >= lower[2] && pixel[2] <= upper[2])
+            {
+                // Set the output pixel value to 255(white)
+                frame.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
+            }
+            else
+            {
+                // Set the output pixel value to 0(black)
+                frame.at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 0);
+            }
+        }
+    }
+
+    //converting to the right type so it won't cause errors after
+    RGBToGray(frame);
 }
 
 //struct Point
