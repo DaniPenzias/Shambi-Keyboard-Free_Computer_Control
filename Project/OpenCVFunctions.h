@@ -8,10 +8,11 @@
 
 class OpenCVFunctions
 {
+private:
+	static void RGBToGray(cv::Mat& frame);
 public:
 	static void RGBToHSV(cv::Mat& frame);
-	static void RGBToGray(cv::Mat& frame);
-	static void FindContours(const cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours);
+	static void FindContours(cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours);
 	static void InRange(cv::Mat& frame, const cv::Scalar lower, const cv::Scalar upper);
 	static void MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel);
 };

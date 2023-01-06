@@ -137,91 +137,49 @@ void OpenCVFunctions::InRange(cv::Mat& frame, cv::Scalar lower, cv::Scalar upper
     RGBToGray(frame);
 }
 
-//struct Point
-//{
-//    int x;
-//    int y;
-//
-//    Point(int x_, int y_) : x(x_), y(y_) {}
-//};
-
 // Find the external contours of a single-channel 8-bit image using CHAIN_APPROX_SIMPLE
 // image: input image (single-channel 8-bit)
 // contours: output vector of contours (each contour is a vector of points)
-void OpenCVFunctions::FindContours(const cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours)
+void OpenCVFunctions::FindContours(cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours)
 {
-    //// Initialize the output vector
-    //contours.clear();
+    // The width and height of the image
+    int width = frame.cols;
+    int height = frame.rows;
 
-    //// Check if the image is empty
-    //if (frame.empty())
-    //{
-    //    return;
-    //}
+    // We'll use a simple breadth-first search to find all the contours
+    std::vector<std::vector<bool>> visited(height, std::vector<bool>(width, false));
+    std::vector<cv::Point> neighbors{ {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-    //// Check if the image is single-channel
-    //if (frame.channels() != 1)
-    //{
-    //    throw std::invalid_argument("Image must be single-channel");
-    //}
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Skip pixels that have already been visited or are not part of a contour
+            if (visited[y][x] || frame.at<uchar>(y, x) == 0) continue;
 
-    //// Check if the image is 8-bit
-    //if (frame.depth() != CV_8U)
-    //{
-    //    throw std::invalid_argument("Image must be 8-bit");
-    //}
+            // This pixel is the starting point of a new contour
+            std::vector<cv::Point> contour;
+            std::vector<cv::Point> search_queue = { {x, y} };
+            visited[y][x] = true;
 
-    //// Create a copy of the image
-    //cv::Mat imageCopy = frame.clone();
+            while (!search_queue.empty()) {
+                cv::Point p = search_queue.back();
+                search_queue.pop_back();
+                contour.push_back(p);
 
-    //// Threshold the image to create a binary image
-    //cv::threshold(imageCopy, imageCopy, 128, 255, cv::THRESH_BINARY);
+                // Add all the unvisited neighbors of p to the search queue
+                for (cv::Point n : neighbors) {
+                    int nx = p.x + n.x;
+                    int ny = p.y + n.y;
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height && !visited[ny][nx] && frame.at<uchar>(ny, nx) != 0) {
+                        search_queue.push_back({ nx, ny });
+                        visited[ny][nx] = true;
+                    }
+                }
+            }
 
-    //// Create a visited map to mark which pixels have been visited
-    //cv::Mat visited(frame.rows, frame.cols, CV_8U, cv::Scalar(0));
-
-    //// Find the external contours using a breadth-first search
-    //for (int y = 0; y < frame.rows; y++)
-    //{
-    //    for (int x = 0; x < frame.cols; x++)
-    //    {
-    //        // Check if the pixel has not been visited and its value is non-zero
-    //        if (visited.at<uchar>(y, x) == 0 && imageCopy.at<uchar>(y, x) != 0)
-    //        {
-    //            // Initialize the contour and the queue
-    //            std::vector<Point> contour;
-    //            std::queue<Point> queue;
-
-    //            // Add the current pixel to the queue and mark it as visited
-    //            queue.push(Point(x, y));
-    //            visited.at<uchar>(y, x) = 1;
-
-    //            // Perform a breadth-first search to find the contour
-    //            while (!queue.empty())
-    //            {
-    //                // Get the next pixel in the queue
-    //                Point point = queue.front();
-    //                queue.pop();
-
-    //                // Add the pixel to the contour
-    //                contour.push_back(cv::Point(point.x, point.y));
-
-    //                // Check the neighbors of the pixel
-    //                for (int dy = -1; dy <= 1; dy++)
-    //                {
-    //                    for (int dx = -1; dx <= 1; dx++)
-    //                    {
-    //                        // Skip the pixel itself
-    //                        if (dx == 0 && dy == 0)
-    //                        {
-    //                            continue;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
+            // We've found a complete contour, so we add it to the output vector
+            contours.push_back(contour);
+        }
+    }
 }
 
 void OpenCVFunctions::MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel)
