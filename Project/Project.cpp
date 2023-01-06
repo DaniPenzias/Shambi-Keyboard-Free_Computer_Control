@@ -38,11 +38,20 @@ int main()
 		//inRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210), frame);
 		OpenCVFunctions::InRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210));
 
-		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
+		/*kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
 		morphologyEx(frame, frame, cv::MORPH_CLOSE, kernel);
 		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
-		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
+		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);*/
 		//bitwise_and(frame, frame, frame, frame);
+
+		// Create a structuring element with the desired size
+		OpenCVFunctions::StructuringElement se = OpenCVFunctions::GetStructuringElement(12, 12);
+		// Apply the morphological close operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, cv::MORPH_CLOSE);
+		// Create a new structuring element with the same size
+		se = OpenCVFunctions::GetStructuringElement(12, 12);
+		// Apply the morphological open operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, cv::MORPH_OPEN);
 
 		try
 		{

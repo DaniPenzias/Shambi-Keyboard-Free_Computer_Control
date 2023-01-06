@@ -182,6 +182,97 @@ void OpenCVFunctions::FindContours(cv::Mat& frame, std::vector<std::vector<cv::P
     }
 }
 
-void OpenCVFunctions::MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel)
+/*function handles sturcturing elment which is used than in MorphologyEx function*/
+OpenCVFunctions::StructuringElement OpenCVFunctions::GetStructuringElement(int rows, int cols)
 {
+    StructuringElement se;
+    se.rows = rows;
+    se.cols = cols;
+    se.data.resize(rows, std::vector<int>(cols, 1));
+    return se;
+}
+
+/**/
+void OpenCVFunctions::MorphologyEx(cv::Mat& frame, const StructuringElement& se, int operation)
+{
+    // The width and height of the image
+    int width = frame.cols;
+    int height = frame.rows;
+
+    std::vector<std::vector<int>> output(height, std::vector<int>(width));
+
+    if (operation == cv::MORPH_CLOSE) {
+        // Perform dilation followed by erosion
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // Find the maximum value in the neighborhood defined by the structuring element
+                int max_val = 0;
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < height && nx >= 0 && nx < width && se.data[i][j] != 0) {
+                            max_val = std::max(max_val, int(frame.at<uchar>(ny, nx)));
+                        }
+                    }
+                }
+                output[y][x] = max_val;
+            }
+        }
+
+        // Perform erosion
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // Find the minimum value in the neighborhood defined by the structuring element
+                int min_val = std::numeric_limits<int>::max();
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < height && nx >= 0 && nx < width && se.data[i][j] != 0) {
+                            min_val = std::min(min_val, output[ny][nx]);
+                        }
+                    }
+                }
+                frame.at<uchar>(y, x) = min_val;
+            }
+        }
+    }
+    else if (operation == cv::MORPH_OPEN) {
+        // Perform erosion followed by dilation
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // Find the minimum value in the neighborhood defined by the structuring element
+                int min_val = std::numeric_limits<int>::max();
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < height && nx >= 0 && nx < width && se.data[i][j] != 0) {
+                            min_val = std::min(min_val, int(frame.at<uchar>(ny, nx)));
+                        }
+                    }
+                }
+                output[y][x] = min_val;
+            }
+        }
+
+        // Perform dilation
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // Find the maximum value in the neighborhood defined by the structuring element
+                int max_val = 0;
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < height && nx >= 0 && nx < width && se.data[i][j] != 0) {
+                            max_val = std::max(max_val, output[ny][nx]);
+                        }
+                    }
+                }
+                frame.at<uchar>(y, x) = max_val;
+            }
+        }
+    }
 }

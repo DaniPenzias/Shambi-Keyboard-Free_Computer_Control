@@ -9,10 +9,20 @@
 class OpenCVFunctions
 {
 private:
+	//functions used inside public functions
 	static void RGBToGray(cv::Mat& frame);
 public:
+	// A structuring element is a small matrix used in morphological operations
+	struct StructuringElement {
+		int rows;
+		int cols;
+		std::vector<std::vector<int>> data;
+	};
+
+	//functions
 	static void RGBToHSV(cv::Mat& frame);
 	static void FindContours(cv::Mat& frame, std::vector<std::vector<cv::Point>>& contours);
 	static void InRange(cv::Mat& frame, const cv::Scalar lower, const cv::Scalar upper);
-	static void MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel);
+	static void MorphologyEx(cv::Mat& frame, const StructuringElement& se, int operation);
+	static StructuringElement GetStructuringElement(int rows, int cols);
 };
