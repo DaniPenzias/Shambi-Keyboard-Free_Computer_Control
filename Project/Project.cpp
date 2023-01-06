@@ -7,6 +7,7 @@
 #include <vector>
 #include "WinApiFunctions.h"
 #include "OpenCVFunctions.h"
+#include <exception>
 
 #define MOUSE_MOVEMENT 1
 #define LEFT_CLICK 2
@@ -43,10 +44,17 @@ int main()
 		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
 		//bitwise_and(frame, frame, frame, frame);
 
-		//findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-		OpenCVFunctions::FindContours(frame, contours);
+		try
+		{
+			//findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+			OpenCVFunctions::FindContours(frame, contours);
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 		std::cout << contours.size() << std::endl;
-		drawContours(frame, contours, -1, (255, 0, 0), 3);
+		drawContours(frame, contours, -1, (255, 255, 255), 3);
 		//destroyWindow("frame"); //possible to have no window
 		imshow("frame", frame);
 
