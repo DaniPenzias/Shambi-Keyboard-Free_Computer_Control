@@ -45,13 +45,13 @@ int main()
 		//bitwise_and(frame, frame, frame, frame);
 
 		// Create a structuring element with the desired size
-		OpenCVFunctions::StructuringElement se = OpenCVFunctions::GetStructuringElement(12, 12);
+		OpenCVFunctions::StructuringElement se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
 		// Apply the morphological close operation to the frame
-		OpenCVFunctions::MorphologyEx(frame, se, cv::MORPH_CLOSE);
+		OpenCVFunctions::MorphologyEx(frame, se, CLOSE_MORPH);
 		// Create a new structuring element with the same size
-		se = OpenCVFunctions::GetStructuringElement(12, 12);
+		se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
 		// Apply the morphological open operation to the frame
-		OpenCVFunctions::MorphologyEx(frame, se, cv::MORPH_OPEN);
+		OpenCVFunctions::MorphologyEx(frame, se, OPEN_MORPH);
 
 		try
 		{
