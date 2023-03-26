@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
-#define BLOCK_SIZE 12
+#define BLOCK_SIZE 6 //change based on window size
 #define OPEN_MORPH 2
 #define CLOSE_MORPH 3
 
