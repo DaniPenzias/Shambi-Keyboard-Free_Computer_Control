@@ -28,21 +28,29 @@ int main()
 		std::vector<std::vector<Point> > contours;
 		cap >> frame;
 
+		//changing size of frame to make the process later fater
+		cv::resize(frame, frame, cv::Size(320, 240), 0, 0, cv::INTER_LINEAR);
+
 		//cvtColor(frame, frame, COLOR_BGR2HSV);
 		OpenCVFunctions::RGBToHSV(frame);
 
-		//inRange(frame, Scalar(45, 70, 0), Scalar(90, 200, 125), frame); //green
-		//inRange(frame, Scalar(0, 50, 145), Scalar(75, 255, 200), frame); //orange
-		//inRange(frame, Scalar(160, 150, 90), Scalar(180, 255, 255), frame); //pink
-		//inRange(frame, Scalar(170, 110, 120), Scalar(255, 180, 180), frame); //red
 		//inRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210), frame);
 		OpenCVFunctions::InRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210));
 
-		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
+		/*kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
 		morphologyEx(frame, frame, cv::MORPH_CLOSE, kernel);
 		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
-		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);
+		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);*/
 		//bitwise_and(frame, frame, frame, frame);
+
+		// Create a structuring element with the desired size
+		OpenCVFunctions::StructuringElement se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
+		// Apply the morphological close operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, CLOSE_MORPH);
+		// Create a new structuring element with the same size
+		se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
+		// Apply the morphological open operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, OPEN_MORPH);
 
 		try
 		{
@@ -54,9 +62,9 @@ int main()
 			std::cout << e.what() << std::endl;
 		}
 		std::cout << contours.size() << std::endl;
-		drawContours(frame, contours, -1, (255, 255, 255), 3);
-		//destroyWindow("frame"); //possible to have no window
-		imshow("frame", frame);
+		//drawContours(frame, contours, -1, (255, 255, 255), 3);
+		destroyWindow("frame"); //possible to have no window
+		//imshow("frame", frame);
 
 		if (contours.size() > 0)
 		{

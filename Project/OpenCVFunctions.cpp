@@ -3,6 +3,7 @@
 #include <cmath>
 #include <queue>
 #include <vector>
+#include <thread>
 
 /*function converts RGB values to HSV values on frame*/
 void OpenCVFunctions::RGBToHSV(cv::Mat& frame)
@@ -182,6 +183,134 @@ void OpenCVFunctions::FindContours(cv::Mat& frame, std::vector<std::vector<cv::P
     }
 }
 
-void OpenCVFunctions::MorphologyEx(const cv::Mat& frameIn, const cv::Mat& frameOut, int actionType, cv::Mat kernel)
+/*function handles sturcturing elment which is used than in MorphologyEx function*/
+OpenCVFunctions::StructuringElement OpenCVFunctions::GetStructuringElement(int rows, int cols)
 {
+    StructuringElement se;
+    se.rows = rows;
+    se.cols = cols;
+    se.data.resize(rows, std::vector<int>(cols, 1));
+    return se;
+}
+
+/*multithreading function for morphologyEx - dilate and erode*/
+template<typename Func>
+void parallel_for(int start, int end, Func f) {
+    int num_threads = std::thread::hardware_concurrency();
+    int block_size = (end - start) / num_threads;
+
+    std::vector<std::thread> threads;
+    for (int i = 0; i < num_threads; i++) {
+        int block_start = start + i * block_size;
+        int block_end = block_start + block_size;
+        if (i == num_threads - 1) {
+            block_end = end;
+        }
+        threads.push_back(std::thread(f, block_start, block_end));
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+}
+
+/*function performs a dilation on a frame*/
+void OpenCVFunctions::dilate(const cv::Mat& input, cv::Mat& output, const StructuringElement& se) {
+    // Check that the input and output images are valid
+    if (input.empty() || output.empty()) {
+        std::cerr << "Error: input or output image is invalid" << std::endl;
+        return;
+    }
+
+    // Check that the input and output images are the same size
+    if (input.size() != output.size()) {
+        std::cerr << "Error: input and output images must be the same size" << std::endl;
+        return;
+    }
+
+    // Check that the input image is of type CV_8UC1
+    if (input.type() != CV_8UC1) {
+        std::cerr << "Error: input image must be of type CV_8UC1" << std::endl;
+        return;
+    }
+
+    parallel_for_(cv::Range(0, input.rows), [&](const cv::Range& range) {
+        // Loop over the pixels in the block
+        for (int y = range.start; y < range.end; y++) {
+            for (int x = 0; x < input.cols; x++) {
+                // Find the maximum value in the neighborhood defined by the structuring element
+                int max_val = std::numeric_limits<int>::min();
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < input.rows && nx >= 0 && nx < input.cols && se.data[i][j] != 0)
+                            max_val = std::max(max_val, int(input.at<uchar>(ny, nx)));
+                    }
+                    output.at<uchar>(y, x) = max_val;
+                }
+            }
+        }
+    });
+}
+
+/*function performs an erosion on a frame*/
+void OpenCVFunctions::erode(const cv::Mat& input, cv::Mat& output, const StructuringElement& se) {
+    // Check that the input and output images are valid
+    if (input.empty() || output.empty()) {
+        std::cerr << "Error: input or output image is invalid" << std::endl;
+        return;
+    }
+
+    // Check that the input and output images are the same size
+    if (input.size() != output.size()) {
+        std::cerr << "Error: input and output images must be the same size" << std::endl;
+        return;
+    }
+
+    // Check that the input image is of type CV_8UC1
+    if (input.type() != CV_8UC1) {
+        std::cerr << "Error: input image must be of type CV_8UC1" << std::endl;
+        return;
+    }
+
+    parallel_for_(cv::Range(0, input.rows), [&](const cv::Range& range) {
+        // Loop over the pixels in the block
+        for (int y = range.start; y < range.end; y++) {
+            for (int x = 0; x < input.cols; x++) {
+                // Find the minimum value in the neighborhood defined by the structuring element
+                int min_val = std::numeric_limits<int>::max();
+                for (int i = 0; i < se.rows; i++) {
+                    for (int j = 0; j < se.cols; j++) {
+                        int ny = y + i - se.rows / 2;
+                        int nx = x + j - se.cols / 2;
+                        if (ny >= 0 && ny < input.rows && nx >= 0 && nx < input.cols && se.data[i][j] != 0)
+                            min_val = std::min(min_val, int(input.at<uchar>(ny, nx)));
+                    }
+                    output.at<uchar>(y, x) = min_val;
+                }
+            }
+        }
+    });
+}
+
+/*function uses dilation and erosion to get rid of noises in the frame*/
+void OpenCVFunctions::MorphologyEx(cv::Mat& frame, const StructuringElement& se, int operation)
+{
+    // The width and height of the image
+    int width = frame.cols;
+    int height = frame.rows;
+
+    cv::Mat output(height, width, CV_8UC1);
+
+    if (operation == CLOSE_MORPH) {
+        // Perform dilation followed by erosion
+        dilate(frame, output, se);
+        erode(output, frame, se);
+    }
+    else if (operation == OPEN_MORPH) {
+        // Perform erosion followed by dilation
+        erode(frame, output, se);
+        dilate(output, frame, se);
+    }
 }
