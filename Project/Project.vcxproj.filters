@@ -21,9 +21,15 @@
     <ClCompile Include="WinApiFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OpenCVFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinApiFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCVFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,6 +6,8 @@
 #include <opencv2/videoio.hpp>
 #include <vector>
 #include "WinApiFunctions.h"
+#include "OpenCVFunctions.h"
+#include <exception>
 
 #define MOUSE_MOVEMENT 1
 #define LEFT_CLICK 2
@@ -22,40 +24,61 @@ int main()
 
 	while (true)
 	{
-		Mat frame, mask, kernel;
+		Mat frame, kernel;
 		std::vector<std::vector<Point> > contours;
 		cap >> frame;
 
-		//imshow("frame", frame);
+		//changing size of frame to make the process later fater
+		cv::resize(frame, frame, cv::Size(320, 240), 0, 0, cv::INTER_LINEAR);
 
-		cvtColor(frame, frame, COLOR_BGR2HSV);
+		//cvtColor(frame, frame, COLOR_BGR2HSV);
+		OpenCVFunctions::RGBToHSV(frame);
 
-		//inRange(frame, Scalar(45, 70, 0), Scalar(90, 200, 125), mask); //green
-		//inRange(frame, Scalar(0, 50, 145), Scalar(75, 255, 200), mask); //orange
-		//inRange(frame, Scalar(160, 150, 90), Scalar(180, 255, 255), mask); //pink
-		//inRange(frame, Scalar(170, 110, 120), Scalar(255, 180, 180), mask); //red
-		inRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210), mask);
+		//inRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210), frame);
+		OpenCVFunctions::InRange(frame, Scalar(160, 110, 110), Scalar(255, 210, 210));
 
+		/*kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
+		morphologyEx(frame, frame, cv::MORPH_CLOSE, kernel);
 		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
-		morphologyEx(mask, mask, cv::MORPH_CLOSE, kernel);
-		kernel = getStructuringElement(cv::MORPH_RECT, Size(12, 12));
-		morphologyEx(mask, mask, cv::MORPH_OPEN, kernel);
-		//bitwise_and(frame, frame, frame, mask);
+		morphologyEx(frame, frame, cv::MORPH_OPEN, kernel);*/
+		//bitwise_and(frame, frame, frame, frame);
 
-		findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+		// Create a structuring element with the desired size
+		OpenCVFunctions::StructuringElement se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
+		// Apply the morphological close operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, CLOSE_MORPH);
+		// Create a new structuring element with the same size
+		se = OpenCVFunctions::GetStructuringElement(BLOCK_SIZE, BLOCK_SIZE);
+		// Apply the morphological open operation to the frame
+		OpenCVFunctions::MorphologyEx(frame, se, OPEN_MORPH);
+
+		try
+		{
+			//findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+			OpenCVFunctions::FindContours(frame, contours);
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 		std::cout << contours.size() << std::endl;
-		drawContours(frame, contours, -1, (255, 0, 0), 3);
+		//drawContours(frame, contours, -1, (255, 255, 255), 3);
+		destroyWindow("frame"); //possible to have no window
 		//imshow("frame", frame);
-		destroyWindow("frame");
-		imshow("mask", mask);
 
 		if (contours.size() > 0)
 		{
-			//my variables
+			//getting amount of objects
+			int objects = contours.size();
+				
+			//getting x and y values (affecting only when mouse movement is dedected)
 			int x = contours.begin()->begin()->x;
 			int y = contours.begin()->begin()->y;
-			int objects = contours.size();
-
+			const int middlePoint = int(contours.begin()->size() / 2 + 0.5);
+			int x1 = contours.begin()->at(middlePoint).x;
+			int y2 = contours.begin()->at(middlePoint).y;
+			
+			//switch case on amount of objects
 			switch (objects)
 			{
 			case MOUSE_MOVEMENT:
